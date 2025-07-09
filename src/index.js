@@ -20,7 +20,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
+app.use(express.json());
 app.use(bodyParser.json({ limit: "4kb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "4kb" }));
 app.use(cookieParser());
