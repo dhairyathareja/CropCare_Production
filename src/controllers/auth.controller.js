@@ -3,6 +3,24 @@ import ErrorWrapper from "../utils/ErrorWrapper.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import uploadOnCloudinary from "../utils/uploadOnCloudinary.js";
 
+
+
+const generateAccessAndRefreshToken=async(userId)=>{
+    try {
+        
+        let user= await User.findOne({
+            _id:userId
+        })
+        const accessToken=await user.generateAccessToken();
+        const refreshToken= await user.generateRefreshToken();
+        
+        return {refreshToken,accessToken}
+
+    } catch (error) {
+        throw new ErrorHandler(501,`Error While Generating Refresh And Access Token`);
+    }
+}
+
 export const postSignUp=ErrorWrapper(async(req,res,next)=>{
     
 
@@ -48,8 +66,15 @@ export const postSignUp=ErrorWrapper(async(req,res,next)=>{
         let newUser= await User.findOne({
             _id:user._id
         }).select('-password');
-
-        res.status(200).json({
+        
+        const {accessToken,refreshToken}= await generateAccessAndRefreshToken(newUser._id);
+        newUser.refreshToken=refreshToken
+        await user.save()
+        
+        res.status(200)
+        .cookie("RefreshToken",refreshToken)
+        .cookie("AccessToken",accessToken)
+        .json({
             success:true,
             user:newUser
         })
@@ -58,23 +83,6 @@ export const postSignUp=ErrorWrapper(async(req,res,next)=>{
         throw new ErrorHandler(501,`Can't SignUp try later or Contact Admin`);
     }
 })
-
-const generateAccessAndRefreshToken=async(userId)=>{
-    try {
-        
-        let user= await User.findOne({
-            _id:userId
-        })
-        const accessToken=await user.generateAccessToken();
-        const refreshToken= await user.generateRefreshToken();
-        
-        return {refreshToken,accessToken}
-
-    } catch (error) {
-        throw new ErrorHandler(501,`Error While Generating Refresh And Access Token`);
-    }
-}
-
 
 export const postLogin=ErrorWrapper(async(req,res,next)=>{
     const {email,password} = req.body;
@@ -135,6 +143,7 @@ export const postLogout=ErrorWrapper(async(req,res,next)=>{
 
         res.status(200)
         .cookie("RefreshToken","")
+        .cookie("AccessToken","")
         .json({
                 success:true,
                 message:"Logout Successfully",
