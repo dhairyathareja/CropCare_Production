@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.9.0",
     "@google/generative-ai": "^0.17.1",
     "@sashido/teachablemachine-node": "^1.2.2",
     "axios": "^1.7.7",
