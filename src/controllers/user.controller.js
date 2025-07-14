@@ -1,9 +1,12 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { GoogleGenerativeAI } from "@google/generative-ai"; DEPRICIATED
 import ErrorWrapper from "../utils/ErrorWrapper.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import TeachableMachine from "@sashido/teachablemachine-node";
 import uploadOnCloudinary from "../utils/uploadOnCloudinary.js";
 import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
+
+
 
 export const askQuestion=ErrorWrapper(async(req,res,next)=>{
     try {
@@ -11,13 +14,16 @@ export const askQuestion=ErrorWrapper(async(req,res,next)=>{
         if(!question){
             throw new ErrorHandler(401,`Please ask your query`);
         }
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const prompt = question 
-        
-        const result = await model.generateContent(prompt);
 
-        const answer=result.response.text();
+        const ai = new GoogleGenAI({});
+        // const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); DEPRICIATED
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: question,
+        })
+
+        const answer=response.text;
+
         
         
         // const chat ={
@@ -145,12 +151,20 @@ async function advice(question) {
         if(!question){
             throw new ErrorHandler(401,`Please ask your query`);
         }
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const prompt = question;
-        const result = await model.generateContent(prompt);
 
-        const answer=result.response.text();
+        // DEPRICIATED
+        // const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        // const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // const prompt = question;
+        // const result = await model.generateContent(prompt);
+
+        const ai = new GoogleGenAI({});
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: question,
+        });
+
+        const answer=response.text;
         
         return answer;
 
