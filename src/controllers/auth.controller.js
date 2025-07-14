@@ -69,7 +69,7 @@ export const postSignUp=ErrorWrapper(async(req,res,next)=>{
         
         const {accessToken,refreshToken}= await generateAccessAndRefreshToken(newUser._id);
         newUser.refreshToken=refreshToken
-        await user.save()
+        await newUser.save()
         
         res.status(200)
         .cookie("RefreshToken",refreshToken)
